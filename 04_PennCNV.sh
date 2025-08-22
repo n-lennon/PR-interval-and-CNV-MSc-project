@@ -1,4 +1,4 @@
-# code to generate an intensity file, 
+# code to run an intensity file, 
 
 
 #!/bin/bash
