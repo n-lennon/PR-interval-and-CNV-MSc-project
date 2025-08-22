@@ -10,7 +10,7 @@ for i in {1..106}; do
     -y
 done
 
-#Code for pulling the LRR data from UK Biobank, upload as a text file to UK Biobank project and use code above to run.
+#Code for pulling the BAF data from UK Biobank, upload as a text file to UK Biobank project and use code above to run.
 
 #!/bin/bash
 
