@@ -1,4 +1,4 @@
-# code to run an intensity file, 
+# code to run an PennCNV file, 
 
 
 #!/bin/bash
