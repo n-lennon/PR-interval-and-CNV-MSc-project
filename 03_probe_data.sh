@@ -1,45 +1,31 @@
-#Code to run text file from command line
 
-for baf_file in /project/path_to_baf_files/*_baf.txt; do
-  dx run app-swiss-army-knife \
-    -iin= # FILE ID \
-    -icmd="bash generate_pfb.sh ${baf_file} /project/path_to/probes.txt /project/output_folder" \
-    --destination="/project/PFB_output" \
-    --instance-type mem1_ssd1_v2_x2 \
-    --priority normal \
-    -y
-done
+#code to pull probe data 
 
-#Code for pulling the probe data from UK Biobank, upload as a text file to UK Biobank project and use code above to run.
+batch_file=$1
 
-#!/bin/bash
+# Path to probe info file 
+probe_info="/mnt/project/project/merged_probes_selected_chrs.bim"
 
-baf_file=$1
-probe_info_file=$2
-output_folder=$3
+# Output directory for PFB files 
+output_dir="/project/pfb_files"
+mkdir -p "$output_dir"
 
-# Extract batch name
-batch=$(basename ${baf_file} | cut -d "_" -f1)
+# Extract batch name 
+batch_name=$(basename "$batch_file" | sed 's/merged_batch_\(.*\)_sorted.txt/\1/')
 
-# Output file paths
-temp_pfb_output="${output_folder}/${batch}_pfb_temp.txt"
-final_pfb_output="${output_folder}/${batch}_pfb.txt"
+# Calculate mean BAF per line 
+awk '{
+  sum=0; count=0;
+  for (i=1; i<=NF; i++) {
+    if ($i != "NA") {
+      sum+=$i; count++
+    }
+  }
+  if (count > 0) {
+    printf "%.4f\n", sum/count
+  } else {
+    print "NA"
+  }
+}' "$batch_file" > "$output_dir/${batch_name}_pfb.txt"
 
-echo "Processing batch: ${batch}"
-
-# Calculate PFB: mean BAF value per SNP across samples
-awk '{sum=cnt=0; for (i=1;i<=NF;i++) if ($i != "NA") { sum+=$i; cnt++ } print (cnt ? sum/cnt : "NA") }' ${baf_file} | sed '1 i\PFB' > ${temp_pfb_output}
-
-# Check row counts
-lines_probe=$(wc -l < "${probe_info_file}")
-lines_temp_pfb=$(wc -l < "${temp_pfb_output}")
-
-echo "Probe info lines: ${lines_probe}, PFB values lines: ${lines_temp_pfb}"
-
-# Combine probe info and PFB values
-paste ${probe_info_file} ${temp_pfb_output} | grep -vw NA > ${final_pfb_output}
-
-# Clean up temp file
-rm ${temp_pfb_output}
-
-echo "PFB file created: ${final_pfb_output}"
+echo "Generated PFB file for ${batch_name}."
