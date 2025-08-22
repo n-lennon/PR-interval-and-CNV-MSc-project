@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # ---- INPUT ----
-BATCH="$1"  # e.g., b001
+BATCH="$1" 
 
 # ---- FILE PATHS ----
 INTENSITY_DIR="/mnt/project/project/intensity_files_${BATCH}"
