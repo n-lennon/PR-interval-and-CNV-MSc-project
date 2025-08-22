@@ -1,4 +1,16 @@
-#Code for pulling the LRR data from UK Biobank
+#Code to run text file from command line
+chr= #1-22, x, xy
+for i in {1..106}; do
+  dx run app-swiss-army-knife \
+    -iin= #Text file ID \
+    -icmd="bash  ${chr} ${i}" \
+    --destination="/project/L2R/chr${chr}_batches" \
+    --instance-type  \
+    --priority  \
+    -y
+done
+
+#Code for pulling the LRR data from UK Biobank, uploaded as a text file.
 
 #!/bin/bash
 
